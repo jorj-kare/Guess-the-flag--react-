@@ -1,0 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredericka+the+Great&display=swap");
+:root {
+  --color-correct: #118b50;
+  --color-fail: #b82132;
+  --color-primary: #116a7b;
+  --color-background-2: #fff4ea;
+  --color-background: #fce7c8;
+  --color-secondary: #11697ba9;
+  --border-primary: 4px double #11697ba9;
+}
+
+body {
+  font-weight: 400;
+  font-style: normal;
+  font-family: "Fredericka the Great", serif;
+}
