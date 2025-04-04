@@ -64,6 +64,12 @@
       height: 75%;
     }
   }
+  .continent-btn {
+    transition: all 0.5s;
+  }
+  .continent-btn:hover {
+    background-color: #025566a9;
+  }
 }
 @media (min-width: 992px) {
   .continents-wrapper {
