@@ -1,0 +1,8 @@
+.spinner {
+  grid-column: 1/-1;
+  justify-self: center;
+  align-self: center;
+  font-size: 30px;
+  letter-spacing: 3px;
+  z-index: 100;
+}

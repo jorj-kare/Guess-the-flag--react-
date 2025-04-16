@@ -6,9 +6,9 @@ import Flag from "src/components/Flag/component";
 import ContinentButton from "src/components/ContinentButton/component";
 import Counter from "src/components/Counter/component";
 import CountryToBeFound from "src/components/CountryToBeFound/component";
-import FailedAttemptsCounter from "src/components/FailedAttemptsCounter/component";
 import EndGame from "src/components/EndGame/component";
 import Footer from "src/components/Footer/component";
+import Spinner from "src/components/Spinner/component";
 const CONTINENTS = [
   "africa",
   "europe",
@@ -84,7 +84,7 @@ function App() {
     }
   }, [data, error]);
 
-  function onFlagClick(name) {
+  function handleFlagClick(name) {
     if (name == countryToBeFound.name.common) {
       setIsAnswer("correct");
       const decreasedArray = Countries.filter(
@@ -141,16 +141,17 @@ function App() {
             isAnswer={isAnswer}
           />
           <Counter
-            countryCounter={countryCounter}
-            totalCountries={data?.length}
-            isAnswer={isAnswer}
-          />
-          <FailedAttemptsCounter
-            isAnswer={isAnswer}
-            failedAttempts={failedAttempts}
-          />
+            title="Found:"
+            className={isAnswer == "correct" ? isAnswer : ""}>
+            {countryCounter}/{data?.length}
+          </Counter>
+          <Counter
+            title="Fails:"
+            className={isAnswer == "wrong" ? isAnswer : ""}>
+            {failedAttempts}
+          </Counter>
           <div className={`flags-wrapper ${isAnswer}`}>
-            {loading && <span className="spinner">Loading...</span>}
+            {loading && <Spinner />}
             {!loading &&
               randomCountries &&
               randomCountries.map((country) => (
@@ -159,7 +160,7 @@ function App() {
                   key={country.name.common}
                   name={country.name.common}
                   countryToBeFound={countryToBeFound}
-                  onFlagClick={() => onFlagClick(country.name.common)}
+                  onFlagClick={() => handleFlagClick(country.name.common)}
                   flag={country.flags}
                 />
               ))}

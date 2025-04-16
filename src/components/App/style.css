@@ -35,14 +35,7 @@
     color: var(--color-fail);
   }
 }
-.spinner {
-  grid-column: 1/-1;
-  justify-self: center;
-  align-self: center;
-  font-size: 30px;
-  letter-spacing: 3px;
-  z-index: 100;
-}
+
 .iconify {
   width: 90%;
   height: 90%;
@@ -51,6 +44,7 @@
 
 .wrong {
   color: var(--color-fail) !important;
+
   border-color: var(--color-fail) !important;
 }
 .correct {

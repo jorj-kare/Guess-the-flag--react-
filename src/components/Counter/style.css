@@ -1,4 +1,38 @@
-.counter--found {
-  grid-row: 1/2;
-  grid-column: 2/3;
+.counter-box {
+  display: flex;
+  gap: 5px;
+  position: relative;
+  align-self: center;
+  justify-self: end;
+  align-items: center;
+
+  & .counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    padding: 20px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: var(--border-primary);
+    border-width: 2px;
+    font-size: 14px;
+    font-weight: 300;
+    transition: all 0.5s linear;
+  }
+}
+@media (min-width: 768px) {
+  .counter-box {
+    justify-self: center;
+    gap: 10px;
+    padding-right: 30px;
+    font-size: 16px;
+
+    & .counter {
+      margin-right: 20px;
+      padding: 25px;
+      font-size: 16px;
+    }
+  }
 }
