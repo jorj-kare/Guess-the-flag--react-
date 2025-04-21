@@ -1,11 +1,9 @@
 import { Icon } from "@iconify/react";
 import "./style.css";
-function EndGame(props) {
+function Statistics(props) {
   return (
     <div className="end-game">
-      <button
-        className="close-window"
-        onClick={() => props.goBackToContinents()}>
+      <button className="close-window" onClick={() => props.endGame()}>
         <Icon icon="solar:close-circle-bold" />
       </button>
       <span className="continent">
@@ -23,4 +21,4 @@ function EndGame(props) {
     </div>
   );
 }
-export default EndGame;
+export default Statistics;

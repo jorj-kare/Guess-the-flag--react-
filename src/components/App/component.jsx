@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
-import useFetch from "./hooks";
+import { useEffect, useState } from "react";
 import { getRandomInteger, shuffleArray } from "./utils";
 import "./style.css";
 import Flag from "src/components/Flag/component";
 import ContinentButton from "src/components/ContinentButton/component";
 import Counter from "src/components/Counter/component";
 import CountryToBeFound from "src/components/CountryToBeFound/component";
-import EndGame from "src/components/EndGame/component";
+import Statistics from "src/components/Statistics/component";
 import Footer from "src/components/Footer/component";
 import Spinner from "src/components/Spinner/component";
 const CONTINENTS = [
@@ -22,6 +21,7 @@ const FILTER = {
   europe: (country) =>
     country.name.common != "Svalbard and Jan Mayen" &&
     country.name.common != "Åland Islands",
+
   africa: (country) =>
     country.name.common != "British Indian Ocean Territory" &&
     country.name.common != "Western Sahara",
@@ -34,70 +34,63 @@ const FILTER = {
     country.name.common != "British Indian Ocean Territory" &&
     country.name.common != "Western Sahara",
 };
+
 function App() {
-  const [continent, setContinent] = useState(null);
-  const [Countries, setCountries] = useState();
-  const [randomCountries, setRandomCountries] = useState(null);
+  const [continent, setContinent] = useState("");
+  const [countries, setCountries] = useState();
+  const [randomCountries, setRandomCountries] = useState([null]);
   const [countryToBeFound, setCountryToBeFound] = useState(null);
   const [countryCounter, setCountryCounter] = useState(0);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isAnswer, setIsAnswer] = useState("");
-  const [endGame, setEndGame] = useState(false);
+  const [error, setError] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [totalNumberOfCountries, setTotalNumberOfCountries] = useState();
 
-  const url =
-    continent == null
-      ? null
-      : continent == "all"
-      ? `https://restcountries.com/v3.1/all?fields=name,capital,flags,population,languages,subregion`
-      : `https://restcountries.com/v3.1/region/${continent}?fields=name,capital,flags,population,languages,subregion`;
+  async function fetchData(continent) {
+    const url =
+      continent == null
+        ? null
+        : continent == "all"
+        ? `https://restcountries.com/v3.1/all?fields=name,capital,flags,population,languages,subregion`
+        : `https://restcountries.com/v3.1/region/${continent}?fields=name,capital,flags,population,languages,subregion`;
+    setLoading(true);
+    setContinent(continent);
+    const res = await fetch(url);
 
-  const { data, loading, error } = useFetch(url);
+    const data = await res.json();
+    if (!res.ok) {
+      console.log("ERROR " + data.status + ":" + data.message);
 
-  useEffect(() => {
-    let shuffledArray;
-    if (data) {
-      if (continent == "europe") {
-        shuffledArray = shuffleArray(
-          data.filter(
-            (country) =>
-              country.name.common != "Svalbard and Jan Mayen" &&
-              country.name.common != "Åland Islands"
-          )
-        );
-      } else {
-        console.log(data[0].subregion);
-
-        console.log(FILTER[continent]);
-
-        shuffledArray = shuffleArray(data.filter(FILTER[continent]));
-      }
-      console.log(shuffledArray.map((c) => c.name.common));
-
-      setCountries(shuffledArray);
-      const someCountries = shuffledArray.slice(0, 9);
-      setRandomCountries(someCountries);
-      setCountryToBeFound(
-        someCountries[getRandomInteger(0, someCountries.length)]
-      );
-    } else if (error) {
-      console.log(error);
+      setError(data);
+      console.log(res);
+      return;
     }
-  }, [data, error]);
+    const shuffledArray = shuffleArray(data.filter(FILTER[continent]));
+    const someCountries = shuffledArray.slice(0, 9);
+
+    setCountries(shuffledArray);
+    setTotalNumberOfCountries(shuffledArray);
+    setRandomCountries(someCountries.slice(0, 9));
+    setCountryToBeFound(
+      someCountries[getRandomInteger(0, someCountries.length)]
+    );
+
+    setLoading(false);
+  }
 
   function handleFlagClick(name) {
     if (name == countryToBeFound.name.common) {
       setIsAnswer("correct");
-      const decreasedArray = Countries.filter(
+      const decreasedArray = countries.filter(
         (country) => country.name.common != name
       );
-      if (decreasedArray.length == 0) {
-        setEndGame(true);
-      }
+
       setTimeout(() => {
-        setCountries(decreasedArray);
         setCountryCounter((prevScore) => prevScore + 1);
         const shuffledArray = shuffleArray(decreasedArray);
         const someCountries = shuffledArray.slice(0, 9);
+        setCountries(shuffledArray);
         setCountryToBeFound(
           someCountries[getRandomInteger(0, someCountries.length)]
         );
@@ -111,19 +104,18 @@ function App() {
       setIsAnswer("");
     }, 800);
   }
-  function goBackToContinents() {
-    setEndGame(false);
-    setContinent(null);
+  function endGame() {
+    setContinent("");
     setCountryCounter(0);
     setFailedAttempts(0);
   }
-  if (endGame)
+  if (continent && countries?.length == 0)
     return (
       <div className="app">
-        <EndGame
+        <Statistics
           continent={continent}
-          goBackToContinents={goBackToContinents}
-          totalCountries={data.length}
+          endGame={endGame}
+          totalCountries={totalNumberOfCountries.length}
           failedAttempts={failedAttempts}
         />
       </div>
@@ -132,7 +124,7 @@ function App() {
     return (
       <div className="app">
         <div className="dashboard">
-          <button className="end-game-btn" onClick={goBackToContinents}>
+          <button className="end-game-btn" onClick={endGame}>
             x
           </button>
 
@@ -143,7 +135,7 @@ function App() {
           <Counter
             title="Found:"
             className={isAnswer == "correct" ? isAnswer : ""}>
-            {countryCounter}/{data?.length}
+            {countryCounter}/{totalNumberOfCountries?.length}
           </Counter>
           <Counter
             title="Fails:"
@@ -184,7 +176,7 @@ function App() {
             <ContinentButton
               key={continent}
               name={continent}
-              setContinent={setContinent}
+              onClickBtn={() => fetchData(continent)}
             />
           ))}
         </div>

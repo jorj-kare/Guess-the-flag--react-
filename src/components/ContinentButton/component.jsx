@@ -3,9 +3,7 @@ import "./style.css";
 import { europe } from "src/assets/icons";
 function ContinentButton(props) {
   return (
-    <button
-      className="continent-btn"
-      onClick={() => props.setContinent(props.name)}>
+    <button className="continent-btn" onClick={props.onClickBtn}>
       {props.name == "africa" ? (
         <Icon icon="game-icons:africa" />
       ) : props.name == "south america" ? (
